@@ -107,9 +107,7 @@ async function create(req,res){
 }
 
 // function create(req, res) {
-//   console.log('********************************************************')
-//   console.log(req.body.data)
-//   console.log('********************************************************')
+
 //   service
 //     .create(req.body.data)
 //     .then((data) => res.status(201).json({ data }))
@@ -117,9 +115,11 @@ async function create(req,res){
 // }
 
 async function list(req, res) {
+
   try {
     const date = req.query.date;
-    const reservations = await service.list(date);
+    const reservations = await (mobile_number ? service.searchByPhone(mobile_number) : service.searchByDate(date))
+    console.log('reservations:', reservations)
     res.status(200).json({ data: reservations });
   } catch (error) {
     res.status(500).json({ message: error.message });
