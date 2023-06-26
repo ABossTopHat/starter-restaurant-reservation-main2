@@ -114,16 +114,30 @@ async function create(req,res){
 //     .catch(console.error);
 // }
 
-async function list(req, res) {
+// async function list(req, res) {
 
-  try {
-    const date = req.query.date;
-    const reservations = await (mobile_number ? service.searchByPhone(mobile_number) : service.searchByDate(date))
-    console.log('reservations:', reservations)
-    res.status(200).json({ data: reservations });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+//   try {
+//     const date = req.query.date;
+//     const reservations = await (mobile_number ? service.searchByPhone(mobile_number) : service.searchByDate(date))
+//     console.log('reservations:', reservations)
+//     res.status(200).json({ data: reservations });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+async function list(req,res){
+  const {date, mobile_number} = req.query;
+ let data;
+ if(date){
+  data = await service.searchByDate(date)
+ }else if(mobile_number){
+  data = await service.searchByPhoneNumber(mobile_number)
+ }
+ else{
+  data = await service.list()
+ }
+ console.log('date:', date, 'data:', data)
+ res.status(201).json({data})
 }
 
 module.exports = {
