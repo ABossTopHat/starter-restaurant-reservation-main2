@@ -137,7 +137,7 @@ async function list(req,res){
   data = await service.list()
  }
  console.log('date:', date, 'data:', data)
- res.status(201).json({data})
+ res.json({data})
 }
 
 module.exports = {
