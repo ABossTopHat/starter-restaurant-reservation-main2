@@ -80,7 +80,7 @@ if (!timeRegex.test(reservationTime)) {
 
     if (dateObj < new Date() || dayOfWeek === 2) {
       errors.push(
-        "Reservation date must be in the future and not on a Tuesday."
+        "Reservation date must be in the future and not on a Tuesday, we are closed."
       );
     }
   }
