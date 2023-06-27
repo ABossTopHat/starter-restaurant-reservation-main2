@@ -2,9 +2,17 @@ const express = require('express');
 const tablesController = require('./tables.controller');
 const router = express.Router();
 
-router.get('/:table_id', tablesController.getTable);
-router.post('/', tablesController.createTable);
-router.get('/', tablesController.getAllTables);
-router.put('/:table_id/seat', tablesController.seatReservation);
+router
+  .route('/')
+  .get(tablesController.getAllTables)
+  .post(tablesController.createTable);
+
+router
+  .route('/:table_id')
+  .get(tablesController.getTable);
+
+router
+  .route('/:table_id/seat')
+  .put(tablesController.seatReservation);
 
 module.exports = router;

@@ -1,31 +1,29 @@
 const knex = require('../db/connection');
 
 function getTableById(tableId) {
-  return knex('tables')
-    .where('table_id', tableId)
-    .first();
+  return knex('tables').where('table_id', tableId).first();
 }
 
 function createTable(tableData) {
-  return knex('tables')
-    .insert(tableData)
-    .returning('*');
+  return knex('tables').insert(tableData).returning('*');
 }
 
 function getAllTables() {
-  return knex('tables')
-    .orderBy('table_name');
+  return knex('tables').orderBy('table_name');
 }
 
 function seatReservation(tableId, reservationId) {
-  return knex('tables')
-    .where('table_id', tableId)
-    .update({ reservation_id: reservationId });
+  return knex('tables').where('table_id', tableId).update({ reservation_id: reservationId });
 }
+function getReservationById(reservationId) {
+    return knex('reservations').where('reservation_id', reservationId).first();
+  }
+  
 
 module.exports = {
   getTableById,
   createTable,
   getAllTables,
   seatReservation,
+  getReservationById,
 };

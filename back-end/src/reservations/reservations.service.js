@@ -30,10 +30,17 @@ function list() {
       .returning("*")
       .then((createdRecords) => createdRecords[0]);
   }
+  function read(reservation_id) {
+    return knex('reservations')
+      .where({reservation_id: reservation_id})
+      .first();
+  }
+  
 
 module.exports = {
   list,
   create,
   searchByPhoneNumber,
-  searchByDate
+  searchByDate,
+  read,
 };

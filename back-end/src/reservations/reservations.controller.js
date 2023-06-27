@@ -106,41 +106,67 @@ async function create(req,res){
   res.status(201).json({data: await service.create(req.body.data)})
 }
 
-// function create(req, res) {
-
-//   service
-//     .create(req.body.data)
-//     .then((data) => res.status(201).json({ data }))
-//     .catch(console.error);
-// }
-
-// async function list(req, res) {
-
-//   try {
-//     const date = req.query.date;
-//     const reservations = await (mobile_number ? service.searchByPhone(mobile_number) : service.searchByDate(date))
-//     console.log('reservations:', reservations)
-//     res.status(200).json({ data: reservations });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// }
 async function list(req,res){
-  const {date, mobile_number} = req.query;
+  const {date, mobile_number,reservation_id} = req.query;
  let data;
+ if(reservation_id){
+  data = await service.searchById(reservation_id)
+ }
  if(date){
   data = await service.searchByDate(date)
- }else if(mobile_number){
+ }
+ else if(mobile_number){
   data = await service.searchByPhoneNumber(mobile_number)
  }
  else{
   data = await service.list()
  }
- console.log('date:', date, 'data:', data)
+ 
  res.json({data})
+}
+
+function hasResId(req, res, next) {
+  const reservation_id =
+    req.params.reservation_id || req.body?.data?.reservation_id;
+
+  if (reservation_id) {
+    res.locals.reservation_id = reservation_id;
+    next();
+  } else {
+    next({
+      status: 400,
+      message: `reservation_id is required`,
+    });
+  }
+}
+async function read(req, res) {
+  const data = res.locals.reservation;
+  res.json({
+    data,
+  });
+}
+
+async function reservationExists(req,res,next){
+  const reservation_id = res.locals.reservation_id;
+  const reservation = await service.read(reservation_id)
+  if(reservation){
+    res.locals.reservation = reservation
+    next()
+  }
+  else{
+    next({
+      status: 404,
+      message: 'reservation Id dose not exist'
+    })
+  }
 }
 
 module.exports = {
   create: [hasRequiredProperties, hasOnlyValidProperties, createValidation, asyncErrorBoundary(create)],
   list: [asyncErrorBoundary(list)],
+  read: [
+    hasResId,
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(read),
+  ],
 };
