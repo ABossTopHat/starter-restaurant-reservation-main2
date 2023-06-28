@@ -240,6 +240,7 @@ describe("US-04 - Seat reservation", () => {
         expect(response.body.error).toBeUndefined();
         expect(response.status).toBe(200);
       });
+      
       test("returns 400 if table does not have sufficient capacity", async () => {
         expect(barTableOne).not.toBeUndefined();
 

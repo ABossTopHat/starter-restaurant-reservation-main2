@@ -16,6 +16,12 @@ function seatReservation(tableId, reservationId) {
   return knex('tables').where('table_id', tableId).update({ reservation_id: reservationId });
 }
 
+function finishOccupiedTable(tableId) {
+  return knex("tables")
+    .where("table_id", tableId)
+    .update({ reservation_id: null });
+}
+
   
 
 module.exports = {
@@ -23,5 +29,5 @@ module.exports = {
   createTable,
   getAllTables,
   seatReservation,
-
+  finishOccupiedTable,
 };
