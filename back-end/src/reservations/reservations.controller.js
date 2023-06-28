@@ -161,6 +161,21 @@ async function reservationExists(req,res,next){
   }
 }
 
+async function updateStatus(req, res) {
+  const { status } = req.body.data;
+  const reservation = res.locals.reservation;
+
+  if (reservation.status === "finished") {
+    return next({
+      status: 400,
+      message: `A finished reservation cannot be updated.`,
+    });
+  }
+
+  const data = await service.updateStatus(reservation.reservation_id, status);
+  res.json({ data });
+}
+
 module.exports = {
   create: [hasRequiredProperties, hasOnlyValidProperties, createValidation, asyncErrorBoundary(create)],
   list: [asyncErrorBoundary(list)],
@@ -169,4 +184,10 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(read),
   ],
+  updateStatus: [
+    hasResId,
+    asyncErrorBoundary(reservationExists),
+    updateStatus
+  ]
+
 };
