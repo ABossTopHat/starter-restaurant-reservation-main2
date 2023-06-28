@@ -15,9 +15,7 @@ function getAllTables() {
 function seatReservation(tableId, reservationId) {
   return knex('tables').where('table_id', tableId).update({ reservation_id: reservationId });
 }
-function getReservationById(reservationId) {
-    return knex('reservations').where('reservation_id', reservationId).first();
-  }
+
   
 
 module.exports = {
@@ -25,5 +23,5 @@ module.exports = {
   createTable,
   getAllTables,
   seatReservation,
-  getReservationById,
+
 };

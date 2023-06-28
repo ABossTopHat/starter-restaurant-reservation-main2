@@ -35,7 +35,9 @@ function list() {
       .where({reservation_id: reservation_id})
       .first();
   }
-  
+  function getReservationById(reservationId) {
+    return knex('reservations').where('reservation_id', reservationId).first();
+  }
 
 module.exports = {
   list,
@@ -43,4 +45,5 @@ module.exports = {
   searchByPhoneNumber,
   searchByDate,
   read,
+  getReservationById,
 };

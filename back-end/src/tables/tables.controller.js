@@ -1,6 +1,12 @@
 const tablesService = require('./tables.service');
-const reservationsService = require('./reservations.service');
+const reservationsService = require('../reservations/reservations.service');
+const hasProperties = require('../errors/hasProperties')
+const asyncErrorBoundary = require('../errors/asyncErrorBoundary')
 
+
+const requiredProperties = [
+  "reservation_id",
+]
 
 async function getTable(req, res, next) {
   try {
@@ -54,11 +60,13 @@ async function getAllTables(req, res, next) {
   }
 }
 
+const hasReservationId = hasProperties(requiredProperties)
+
 async function seatReservation(req, res, next) {
   try {
     const { table_id } = req.params;
-    const { reservation_id } = req.body;
-
+    const { reservation_id } = req.body.data;
+  
     if (!reservation_id) {
       return res.status(400).json({
         error: 'reservation_id is required.',
@@ -68,7 +76,7 @@ async function seatReservation(req, res, next) {
     const table = await tablesService.getTableById(table_id);
 
     if (!table) {
-      return res.status(404).json({
+      return res.status(400).json({
         error: `Table ${table_id} not found.`,
       });
     }
@@ -93,9 +101,15 @@ async function seatReservation(req, res, next) {
       });
     }
 
+    if(reservation.people > 0){
+      return res.status(400).json({
+        error: 'Table is at capacity'
+      })
+    }
+
     await tablesService.seatReservation(table_id, reservation_id);
 
-    res.sendStatus(200);
+    return res.status(200);
   } catch (error) {
     next(error);
   }
@@ -106,5 +120,5 @@ module.exports = {
   getTable,
   createTable,
   getAllTables,
-  seatReservation,
+  seatReservation: [hasReservationId, asyncErrorBoundary(seatReservation)],
 };
