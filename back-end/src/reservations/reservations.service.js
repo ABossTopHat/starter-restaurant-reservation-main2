@@ -25,6 +25,7 @@ function list() {
   }
 
   function create(newReservation) {
+    newReservation.status = 'booked'
     return knex("reservations")
       .insert(newReservation)
       .returning("*")
@@ -38,7 +39,16 @@ function list() {
   function getReservationById(reservationId) {
     return knex('reservations').where('reservation_id', reservationId).first();
   }
-
+  async function updateStatus(reservationId, status) {
+    const updatedReservation = await knex("reservations")
+      .where({ reservation_id: reservationId })
+      .update({ status: status }, ["*"]);
+    return updatedReservation[0];
+  }
+  async function searchById(reservationId) {
+    return knex('reservations').where('reservation_id', reservationId).first();
+  }
+  
 module.exports = {
   list,
   create,
@@ -46,4 +56,6 @@ module.exports = {
   searchByDate,
   read,
   getReservationById,
+  updateStatus,
+  searchById,
 };

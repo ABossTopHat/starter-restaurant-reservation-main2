@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const controller = require("./reservations.controller");
 const methodNotAllowed = require('../errors/methodNotAllowed')
+const asyncErrorBoundary = require('../errors/asyncErrorBoundary')
 
 router.route("/")
   .get(controller.list)

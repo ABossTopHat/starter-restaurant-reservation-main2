@@ -9,6 +9,7 @@ const VALID_PROPERTIES = [
   "reservation_date",
   "reservation_time",
   "people",
+  "status"
 ];
 
 const REQUIRED_PROPERTIES = [
@@ -92,6 +93,8 @@ if (!timeRegex.test(reservationTime)) {
     errors.push("Invalid number of people. Must be a number greater than 0.");
   }
 
+  // Valid Status
+
   if (errors.length) {
     return next({
       status: 400,
@@ -102,27 +105,26 @@ if (!timeRegex.test(reservationTime)) {
   next();
 }
 
-async function create(req,res){
-  res.status(201).json({data: await service.create(req.body.data)})
+async function create(req, res) {
+  const newReservation = req.body.data;
+  const createdReservation = await service.create(newReservation);
+  res.status(201).json({ data: createdReservation });
 }
 
-async function list(req,res){
-  const {date, mobile_number,reservation_id} = req.query;
- let data;
- if(reservation_id){
-  data = await service.searchById(reservation_id)
- }
- if(date){
-  data = await service.searchByDate(date)
- }
- else if(mobile_number){
-  data = await service.searchByPhoneNumber(mobile_number)
- }
- else{
-  data = await service.list()
- }
- 
- res.json({data})
+async function list(req, res) {
+  const { date, mobile_number, reservation_id } = req.query;
+  let data;
+  if (reservation_id) {
+    data = await service.getReservationById(reservation_id);
+  } else if (date) {
+    data = await service.searchByDate(date);
+  } else if (mobile_number) {
+    data = await service.searchByPhoneNumber(mobile_number);
+  } else {
+    data = await service.list();
+  }
+
+  res.json({ data });
 }
 
 function hasResId(req, res, next) {
@@ -140,10 +142,7 @@ function hasResId(req, res, next) {
   }
 }
 async function read(req, res) {
-  const data = res.locals.reservation;
-  res.json({
-    data,
-  });
+  res.json({ data: res.locals.reservation });
 }
 
 async function reservationExists(req,res,next){
@@ -156,28 +155,70 @@ async function reservationExists(req,res,next){
   else{
     next({
       status: 404,
-      message: 'reservation Id dose not exist'
+      message: `reservation Id ${reservation_id} dose not exist`
     })
   }
 }
 
-async function updateStatus(req, res) {
-  const { status } = req.body.data;
-  const reservation = res.locals.reservation;
-
-  if (reservation.status === "finished") {
-    return next({
+async function reservationStatusCheck(req,res,next){
+  const { data } = req.body
+  if(data.status === 'seated' || data.status === 'finished'){
+    next({
       status: 400,
-      message: `A finished reservation cannot be updated.`,
-    });
+      message: `reservation has a status of seated or finished.`
+    })
   }
+  if(data.status !== 'booked'){
+    next({
+      status: 400,
+      message: `status of ${data.status} is an invalid status`
+    })
+  }
+  next()
+}
 
-  const data = await service.updateStatus(reservation.reservation_id, status);
-  res.json({ data });
+async function hasValidStatus(req,res,next){
+  const { data } = req.body
+//check if data body status === book,seated, or finished
+// if(data.status === 'finished'){
+//  return next({
+//     status: 400,
+//     message: `reservation status is finished`
+//   })
+// }
+if(data.status === 'booked'|| data.status === 'seated' || data.status === 'finished'){
+  res.locals.status = data.status
+  return next()
+}
+  next({
+    status: 400,
+    message: `invalid status ${data.status}`
+  })
+}
+
+function isNotFinished(req, res, next){
+  const table = res.locals.reservation
+  if(table.status === 'finished'){
+   return next({
+      status: 400,
+      message: `status of ${table.status} is finished`
+    })
+  }
+  next()
+}
+
+async function updateStatus(req, res) {
+  const reservationId = req.params.reservation_id;
+  const { status } = req.body.data;
+  const updatedReservation = await reservationsService.updateStatus(
+    reservationId,
+    status
+  );
+  res.json({ data: updatedReservation });
 }
 
 module.exports = {
-  create: [hasRequiredProperties, hasOnlyValidProperties, createValidation, asyncErrorBoundary(create)],
+  create: [hasRequiredProperties, hasOnlyValidProperties, createValidation,reservationStatusCheck, asyncErrorBoundary(create)],
   list: [asyncErrorBoundary(list)],
   read: [
     hasResId,
@@ -187,7 +228,9 @@ module.exports = {
   updateStatus: [
     hasResId,
     asyncErrorBoundary(reservationExists),
-    updateStatus
+    isNotFinished,
+    hasValidStatus,
+    asyncErrorBoundary(updateStatus)
   ]
 
 };

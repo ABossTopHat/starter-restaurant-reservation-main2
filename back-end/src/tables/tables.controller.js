@@ -61,9 +61,35 @@ async function getAllTables(req, res, next) {
   }
 }
 
-const hasReservationId = hasProperties(requiredProperties)
+
+function bodyHasReservationId(req,res,next){
+  const {reservation_id} = req.body.data
+  if(!reservation_id){
+    return next({
+      status: 400,
+      message: `no reservation id`
+    })
+  }
+  res.locals.reservation_id = reservation_id
+  next()
+}
+
+
+async function hasReservationId(req,res,next){
+  const reservation = await reservationsService.read(res.locals.reservation_id)
+  if(!reservation){
+    return next({
+      status: 400,
+      message: `${res.locals.reservation_id}`
+    })
+  }else{
+    res.locals.reservation = reservation
+    next()
+  }
+}
 
 async function seatReservation(req, res, next) {
+
   try {
     const { table_id } = req.params;
     const { reservation_id } = req.body.data;
@@ -82,7 +108,7 @@ async function seatReservation(req, res, next) {
       });
     }
 
-    const reservation = await reservationsService.getReservationById(reservation_id);
+    let reservation = await reservationsService.getReservationById(reservation_id);
 
     if (!reservation) {
       return res.status(404).json({
@@ -102,7 +128,16 @@ async function seatReservation(req, res, next) {
           error: 'Table does not have sufficient capacity.',
         });
       }
+      if(reservation.status === 'seated'){
+        return res.status(400).json({
+          error: 'reservation is already seated'
+        })
+      }
 
+      if(reservation.status !== 'seated'){
+        let reservation = await tablesService.updateReservationStatus(reservation_id)
+        console.log('reservation result', reservation)
+      }
       return res.status(200).json();
     } else {
       if (reservation.people > table.capacity) {
@@ -110,7 +145,7 @@ async function seatReservation(req, res, next) {
           error: 'Table does not have sufficient capacity.',
         });
       }
-
+      
       const data = await tablesService.seatReservation(table_id, reservation_id);
       return res.status(200).json({ data });
     }
@@ -144,10 +179,21 @@ async function finishOccupiedTable(req, res, next) {
   }
 }
 
+
+
 module.exports = {
   getTable,
   createTable,
   getAllTables,
-  seatReservation: [hasReservationId, asyncErrorBoundary(seatReservation)],
+  seatReservation:[
+    //check body has data 
+    bodyHasReservationId, 
+    asyncErrorBoundary(hasReservationId),
+    //check if reservation is seated?
+    //check dose table exist? async wrap this() uses service.read
+    // is table large enough? looks at capacity
+    // is the table avalible?
+    asyncErrorBoundary(seatReservation)
+  ],
   finishOccupiedTable,
 };
