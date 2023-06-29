@@ -7,10 +7,11 @@ function list() {
 
   }
   
-  function searchByDate(date){
+  function   searchByDate(date){
     return knex("reservations")
     .select('*')
     .where({ reservation_date: date })
+    .whereNot({status: 'finished'})
     .orderBy("reservation_time");
   }
 
