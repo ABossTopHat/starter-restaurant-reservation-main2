@@ -52,16 +52,10 @@ function list() {
 
   function updateReservation(reservation){
     return knex('reservations')
+    .select("*")
     .where({reservation_id: reservation.reservation_id})
-    .update({
-        first_name: reservation.first_name,
-        last_name: reservation.last_name,
-        mobile_number: reservation.mobile_number,
-        reservation_date: reservation.reservation_date,
-        reservation_time: reservation.reservation_time,
-        people: reservation.people,
-        status: reservation.status,
-      })
+    .update(reservation, "*")
+    .then((record) => record[0]);
   }
   
 module.exports = {

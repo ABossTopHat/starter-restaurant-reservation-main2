@@ -189,7 +189,7 @@ async function hasValidStatus(req,res,next){
 //     message: `reservation status is finished`
 //   })
 // }
-if(data.status === 'booked'|| data.status === 'seated' || data.status === 'finished'){
+if(data.status === 'booked'|| data.status === 'seated' || data.status === 'finished'|| data.status === "cancelled"){
   res.locals.status = data.status
   return next()
 }
@@ -211,19 +211,22 @@ function isNotFinished(req, res, next){
 }
 
 async function updateStatus(req, res) {
-  const reservationId = req.params.reservation_id;
-  const { status } = req.body.data;
+  const {reservation_id} = res.locals.reservation;
+  const status = res.locals.status;
   const updatedReservation = await service.updateStatus(
-    reservationId,
+    reservation_id,
     status
   );
   res.json({ data: updatedReservation });
 }
 
 async function updateReservation(req,res){
-  const reservation = res.locals.reservation
+  const reservation = {
+    ...req.body.data,
+    reservation_id: res.locals.reservation.reservation_id,
+    };
   const updatedReservation = await service.updateReservation(reservation)
-  res.json({updatedReservation})
+  res.json({data: updatedReservation})
 }
 
 module.exports = {
