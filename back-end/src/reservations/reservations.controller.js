@@ -69,7 +69,8 @@ if (!timeRegex.test(reservationTime)) {
   // ValidDate
   const reservationDate = req.body.data.reservation_date;
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-
+  console.log(`reservationDate: ${reservationDate}`)
+  console.log(`reservationDate Test: ${dateRegex.test(reservationDate)}`)
   if (!dateRegex.test(reservationDate)) {
     errors.push(
       "Invalid reservation_date. Date format should be 'YYYY-MM-DD'."
@@ -113,6 +114,7 @@ async function create(req, res) {
 
 async function list(req, res) {
   const { date, mobile_number, reservation_id } = req.query;
+
   let data;
   if (reservation_id) {
     data = await service.getReservationById(reservation_id);
@@ -168,12 +170,12 @@ async function reservationStatusCheck(req,res,next){
       message: `reservation has a status of seated or finished.`
     })
   }
-  if(data.status !== 'booked'){
-    next({
-      status: 400,
-      message: `status of ${data.status} is an invalid status`
-    })
-  }
+  // if(data.status !== 'booked'){
+  //   next({
+  //     status: 400,
+  //     message: `status of ${data.status} is an invalid status`
+  //   })
+  // }
   next()
 }
 

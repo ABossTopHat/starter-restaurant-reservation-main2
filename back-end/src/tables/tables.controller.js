@@ -9,6 +9,8 @@ const requiredProperties = [
   "reservation_id",
 ]
 
+const dataValidation = hasProperties(requiredProperties)
+
 async function getTable(req, res, next) {
   try {
     const { table_id } = req.params;
@@ -42,7 +44,7 @@ async function tableIsValid(req,res,next){
   if(table.reservation_id !== null){
     return next({
       status:400,
-      message: `table is currently being used by ${table.reservation_id}`
+      message: `table is currently being occupied by ${table.reservation_id}`
     })
   }
   next()
@@ -86,7 +88,7 @@ function bodyHasReservationId(req,res,next){
   if(!reservation_id){
     return next({
       status: 400,
-      message: `no reservation id`
+      message: `no reservation_id`
     })
   }
   res.locals.reservation_id = reservation_id
@@ -98,7 +100,7 @@ async function hasReservationId(req,res,next){
   const reservation = await reservationsService.read(res.locals.reservation_id)
   if(!reservation){
     return next({
-      status: 400,
+      status: 404,
       message: `${res.locals.reservation_id}`
     })
   }else{
@@ -148,7 +150,7 @@ async function finishOccupiedTable(req, res, next) {
 
     if (!table) {
       return next({
-        status: 400,
+        status: 404,
         message: `Table ${table_id} not found.`,
       });
     }
@@ -191,6 +193,7 @@ module.exports = {
   createTable,
   getAllTables,
   seatReservation:[
+    dataValidation,
     bodyHasReservationId, 
     asyncErrorBoundary(hasReservationId),
     reservationNotSeated,
