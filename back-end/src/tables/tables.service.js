@@ -12,22 +12,8 @@ function getAllTables() {
   return knex('tables').orderBy('table_name');
 }
 
-async function seatReservation(tableId, reservationId) {
-  const updatedReservation = await knex("reservations")
-    .where({ reservation_id: reservationId })
-    .update({ status: "seated" }, ["*"]);
-  return updatedReservation[0];
-}
-
-function updateReservationStatus(reservationId){
-  return knex('reservations').where('reservation_id', reservationId).update({status: 'seated'})
-}
-
-async function finishReservation(tableId, reservationId) {
-  const updatedReservation = await knex("reservations")
-    .where({ reservation_id: reservationId })
-    .update({ status: "finished" }, ["*"]);
-  return updatedReservation[0];
+function seatReservation(tableId, reservationId) {
+  return knex('tables').where('table_id', tableId).update({ reservation_id: reservationId });
 }
 
 function finishOccupiedTable(tableId) {
@@ -47,3 +33,4 @@ module.exports = {
   updateReservationStatus,
   finishReservation
 };
+
