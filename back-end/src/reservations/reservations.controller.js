@@ -9,7 +9,10 @@ const VALID_PROPERTIES = [
   "reservation_date",
   "reservation_time",
   "people",
-  "status"
+  "status",
+  "reservation_id",
+  "created_at",
+  "updated_at"
 ];
 
 const REQUIRED_PROPERTIES = [
@@ -69,8 +72,6 @@ if (!timeRegex.test(reservationTime)) {
   // ValidDate
   const reservationDate = req.body.data.reservation_date;
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  console.log(`reservationDate: ${reservationDate}`)
-  console.log(`reservationDate Test: ${dateRegex.test(reservationDate)}`)
   if (!dateRegex.test(reservationDate)) {
     errors.push(
       "Invalid reservation_date. Date format should be 'YYYY-MM-DD'."
@@ -219,6 +220,12 @@ async function updateStatus(req, res) {
   res.json({ data: updatedReservation });
 }
 
+async function updateReservation(req,res){
+  const reservation = res.locals.reservation
+  const updatedReservation = await service.updateReservation(reservation)
+  res.json({updatedReservation})
+}
+
 module.exports = {
   create: [hasRequiredProperties, hasOnlyValidProperties, createValidation,reservationStatusCheck, asyncErrorBoundary(create)],
   list: [asyncErrorBoundary(list)],
@@ -233,6 +240,15 @@ module.exports = {
     isNotFinished,
     hasValidStatus,
     asyncErrorBoundary(updateStatus)
+  ],
+  resUpdate:[
+    hasResId,
+    asyncErrorBoundary(reservationExists),
+    isNotFinished,
+    hasRequiredProperties, 
+    hasOnlyValidProperties,
+    createValidation,
+    updateReservation
   ]
 
 };

@@ -6,7 +6,7 @@ function list() {
       .orderBy("reservation_time")
 
   }
-  
+
   function searchByDate(date){
     return knex("reservations")
     .select('*')
@@ -49,6 +49,20 @@ function list() {
   async function searchById(reservationId) {
     return knex('reservations').where('reservation_id', reservationId).first();
   }
+
+  function updateReservation(reservation){
+    return knex('reservations')
+    .where({reservation_id: reservation.reservation_id})
+    .update({
+        first_name: reservation.first_name,
+        last_name: reservation.last_name,
+        mobile_number: reservation.mobile_number,
+        reservation_date: reservation.reservation_date,
+        reservation_time: reservation.reservation_time,
+        people: reservation.people,
+        status: reservation.status,
+      })
+  }
   
 module.exports = {
   list,
@@ -59,4 +73,5 @@ module.exports = {
   getReservationById,
   updateStatus,
   searchById,
+  updateReservation,
 };
