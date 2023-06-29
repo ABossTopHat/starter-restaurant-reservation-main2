@@ -210,7 +210,7 @@ function isNotFinished(req, res, next){
 async function updateStatus(req, res) {
   const reservationId = req.params.reservation_id;
   const { status } = req.body.data;
-  const updatedReservation = await reservationsService.updateStatus(
+  const updatedReservation = await service.updateStatus(
     reservationId,
     status
   );
