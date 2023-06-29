@@ -21,8 +21,15 @@ function finishOccupiedTable(tableId) {
     .where("table_id", tableId)
     .update({ reservation_id: finished });
 }
-
-  
+function updateReservationStatus(reservationId){
+  return knex('reservations').where('reservation_id', reservationId).update({status: 'seated'})
+}
+async function finishReservation(tableId, reservationId) {
+  const updatedReservation = await knex("reservations")
+    .where({ reservation_id: reservationId })
+    .update({ status: "finished" }, ["*"]);
+  return updatedReservation[0];
+}
 
 module.exports = {
   getTableById,
