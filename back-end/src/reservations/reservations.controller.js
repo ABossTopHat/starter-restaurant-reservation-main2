@@ -90,7 +90,7 @@ if (!timeRegex.test(reservationTime)) {
 
   // ValidPeople
   const people = req.body.data.people;
-
+  console.log("people:",people)
   if (!people || typeof people !== "number" || people < 1) {
     errors.push("Invalid number of people. Must be a number greater than 0.");
   }
