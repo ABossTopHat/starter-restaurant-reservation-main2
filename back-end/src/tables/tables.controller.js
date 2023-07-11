@@ -64,7 +64,6 @@ async function createTable(req, res, next) {
       return res.status(400).json({ error: `Invalid table_name or capacity.` });
     }
     
-
     const createdTable = await tablesService.createTable(newTable);
     res.status(201).json({ data: createdTable[0] });
   } catch (error) {

@@ -56,7 +56,7 @@ function createValidation(req, res, next) {
 const reservationTime = req.body.data.reservation_time;
 const timeRegex = /^(0?\d|1\d|2[0-3]):([0-5]\d)$/;
 if (!timeRegex.test(reservationTime)) {
-  errors.push("Invalid reservation_time. Time format should be 'HH:MM' in military format.");
+  errors.push("Invalid reservation_time.");
 } else {
   const [hour, minute] = reservationTime.split(':');
 
@@ -90,7 +90,7 @@ if (!timeRegex.test(reservationTime)) {
 
   // ValidPeople
   const people = req.body.data.people;
-  console.log("people:",people)
+
   if (!people || typeof people !== "number" || people < 1) {
     errors.push("Invalid number of people. Must be a number greater than 0.");
   }

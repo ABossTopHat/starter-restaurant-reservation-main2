@@ -4,7 +4,6 @@ function list() {
     return knex("reservations")
       .select("*")
       .orderBy("reservation_time")
-
   }
 
   function searchByDate(date){
