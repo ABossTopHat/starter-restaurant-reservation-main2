@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ErrorAlert from "../layout/ErrorAlert";
 
 export default function ReservationForm() {
-    let isValid = true
+  let isValid = true
   
   const history = useHistory();
   const base = {
