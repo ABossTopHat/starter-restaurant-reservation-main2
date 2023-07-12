@@ -10,13 +10,13 @@ export default function ReservationForm() {
   const base = {
     first_name: "",
     last_name: "",
-    mobile_number: "000-000-0000",
+    mobile_number: "",
     reservation_date: "",
     reservation_time: "",
     people: 0,
   };
   const [form, setForm] = useState(base);
-
+  console.log('form', form)
   function changeHandler({ target: { name, value } }) {
     if (name === "people") {
       setForm((prevState) => ({
@@ -35,6 +35,7 @@ export default function ReservationForm() {
   let err = []
 
   function validateName(firstName, lastName) {
+    console.log('validate name called')
     if (firstName.trim() === '' || lastName.trim() === '') {
       err.push('Please enter a valid name.') ;
       isValid = false
@@ -42,7 +43,8 @@ export default function ReservationForm() {
     return null; // Validation passed
   }
   function validateMobileNumber(mobileNumber) {
-    const regex = /^\d{3}\d{3}\d{4}$/;
+    console.log('validate number called')
+    const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
     if (!regex.test(mobileNumber)) {
       err.push('Please enter a valid mobile number (e.g., 000-000-0000).');
       isValid = false
@@ -50,6 +52,7 @@ export default function ReservationForm() {
     return null; // Validation passed
   }
   function validateReservationDate(reservationDate) {
+    console.log('validate date called')
     const selectedDate = new Date(reservationDate);
     const currentDate = new Date();
   
@@ -73,6 +76,7 @@ export default function ReservationForm() {
     return null; // Validation passed
   }
   function validateReservationTime(reservationTime) {
+    console.log('validate time called')
     const regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
     if (!regex.test(reservationTime)) {
       err.push ('Please enter a valid reservation time (e.g., 12:00).');
@@ -81,6 +85,7 @@ export default function ReservationForm() {
     return null; // Validation passed
   }
   function validateNumberOfPeople(people) {
+    console.log('validate people called')
     if (!Number.isInteger(people) || people <= 0) {
       err.push('Please enter a valid number of people.');
       isValid = false
@@ -91,16 +96,17 @@ export default function ReservationForm() {
 
   function submitHandler(event) {
     event.preventDefault();
-
+    console.log('submit form', form)
     validateName(form.first_name, form.last_name);
     validateMobileNumber(form.mobile_number);
     validateReservationDate(form.reservation_date);
     validateReservationTime(form.reservation_time);
     validateNumberOfPeople(form.people);
+    console.log('err', err)
     setErrorArray(err)
     if(err.length === 0){
-    createReservation(form);
-    history.push(`/dashboard?date=${form.reservation_date}`);
+    createReservation(form)
+    .then(()=> history.push(`/dashboard?date=${form.reservation_date}`))
     }
   }
 
@@ -133,7 +139,7 @@ export default function ReservationForm() {
             name="mobile_number"
             value={form.mobile_number}
             required={true}
-            placeholder="000-000-0000"
+            placeholder="Phone Number"
             onChange={changeHandler}
           />
           <input
@@ -171,7 +177,7 @@ export default function ReservationForm() {
           Cancel
         </button>
       </form>
-      {errorArray.length > 0 ? errorArray.map((error) => <ErrorAlert error={error}/>) : ''}
+      {errorArray.length > 0 ? errorArray.map((error, index) => <ErrorAlert key={index} error={error}/>) : ''}
     </>
   );
 }
