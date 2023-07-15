@@ -3,6 +3,8 @@ import { createReservation } from "../utils/api";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import ErrorAlert from "../layout/ErrorAlert";
 import { readReservation } from "../utils/api";
+import { updateReservation } from "../utils/api";
+import formatReservationDate from "../utils/format-reservation-date";
 
 export default function ReservationForm({reservationId}){
     let isValid = true
@@ -17,6 +19,8 @@ export default function ReservationForm({reservationId}){
       people: 0,
     };
     const [form, setForm] = useState(base);
+    const[errorArray, setErrorArray] = useState([])
+    let err = []
  
     function loadRes() {
       if(reservationId){
@@ -48,8 +52,7 @@ export default function ReservationForm({reservationId}){
       }
     }
   
-    const[errorArray, setErrorArray] = useState([])
-    let err = []
+
   
     function validateName(firstName, lastName) {
       if (firstName.trim() === '' || lastName.trim() === '') {
@@ -131,9 +134,9 @@ export default function ReservationForm({reservationId}){
       if(err.length === 0){
         if (reservationId){
           const abortController = new AbortController();
-          updateReservation(formData, abortController.signal)
+          updateReservation(form, abortController.signal)
              .then((updatedRes)=>{
-                 history.push(`/dashboard?date=${formatAsDate(updatedRes.reservation_date)}`)
+                 history.push(`/dashboard?date=${formatReservationDate(updatedRes.reservation_date)}`)
              })
           return () => abortController.abort();
         }else{
