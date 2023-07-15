@@ -136,7 +136,7 @@ export default function ReservationForm({reservationId}){
           const abortController = new AbortController();
           updateReservation(form, abortController.signal)
              .then((updatedRes)=>{
-                 history.push(`/dashboard?date=${formatReservationDate(updatedRes.reservation_date)}`)
+                 history.push(`/dashboard?date=${(updatedRes.reservation_date)}`)
              })
           return () => abortController.abort();
         }else{
