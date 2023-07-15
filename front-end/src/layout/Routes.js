@@ -4,9 +4,12 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
-import ReservationForm from'../reservations/newReservations'
+import Reservation from'../reservations/newReservations'
 import useQuery from "../utils/useQuery";
-
+import NewTable from "../tables/tables";
+import SeatRes from "../tables/Seat";
+import EditRes from "../reservations/editReservaton";
+import Search from "../dashboard/Search";
 
 /**
  * Defines all the routes for the application.
@@ -18,6 +21,7 @@ import useQuery from "../utils/useQuery";
 function Routes() {
   const query = useQuery()
   const date = query.get('date')
+  const mobile_number = query.get("mobile_number")
   return (
     <Switch>
       <Route exact={true} path="/">
@@ -30,8 +34,21 @@ function Routes() {
         <Dashboard date={date ? date:today()} />
       </Route>
       <Route path='/reservations/new'>
-        <ReservationForm />
+        <Reservation />
       </Route>
+      <Route path='/tables/new'>
+        <NewTable />
+      </Route>
+      <Route path="/reservations/:reservationId/seat">
+        <SeatRes />
+      </Route>
+      <Route path="/reservations/:reservationId/edit">
+        <EditRes />
+      </Route>
+      <Route path="/search">
+        <Search mobile_number={mobile_number}/>
+      </Route>
+
       <Route>
         <NotFound />
       </Route>

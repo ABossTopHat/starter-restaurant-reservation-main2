@@ -163,7 +163,7 @@ async function finishOccupiedTable(req, res, next) {
 
     await tablesService.finishReservation(table.reservation_id)
     await tablesService.finishOccupiedTable(table_id);
-    return res.status(200).json();
+    return res.status(200).json({});
 }
 
 function reservationNotSeated(req,res,next){

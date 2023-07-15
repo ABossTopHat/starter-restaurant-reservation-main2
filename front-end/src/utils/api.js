@@ -69,7 +69,6 @@ export async function listReservations(params, signal) {
 }
 
 export async function createReservation(reservation,signal){
-  console.log('create called')
   const url = new URL(`${API_BASE_URL}/reservations`);
   const options = {
     method: 'Post',
@@ -78,4 +77,61 @@ export async function createReservation(reservation,signal){
     signal,
   }
   return await fetchJson(url, options, reservation)
+}
+
+export async function createTable(table, signal){
+const url = new URL(`${API_BASE_URL}/tables`)
+const options = {
+  method: 'Post',
+  headers,
+  body: JSON.stringify({data:table}),
+  signal,
+}
+return await fetchJson(url, options, table)
+}
+
+export async function listTables(signal) {
+  const url = new URL(`${API_BASE_URL}/tables`);
+  return await fetchJson(url, { headers, signal }, [])
+}
+export async function cancelReservation(reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({data: {status: "cancelled"}}),
+    signal,
+  };
+  return await fetchJson(url, options, {});
+}
+export async function freeTable(tableId, signal) {
+  const url = `${API_BASE_URL}/tables/${tableId}/seat`;
+  const options = { method: "DELETE", signal };
+  return await fetchJson(url, options, []);
+}
+export async function readReservation(resId, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations/${resId}`);
+
+  return await fetchJson(url, { headers, signal }, [])
+    .then(formatReservationDate)
+}
+export async function updateTable(reservation_id, table_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({data: {reservation_id}}),
+    signal,
+  };
+  return await fetchJson(url, options, {});
+}
+export async function updateReservation(updatedRes, signal) {
+  const url = `${API_BASE_URL}/reservations/${updatedRes.reservation_id}`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({data: updatedRes}),
+    signal,
+  };
+  return await fetchJson(url, options, {});
 }
