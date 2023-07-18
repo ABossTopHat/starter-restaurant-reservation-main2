@@ -58,7 +58,7 @@ export default function NewTable(){
          <form onSubmit={submitHandler}>
             <TableForm edit={false} form={form} changeHandler={changeHandler}/>
             <button type="submit" className="btn">
-              Submit Reservation
+              Submit Table
             </button>
             <button type="button" className="btn" onClick={() => history.goBack()}>
               Cancel

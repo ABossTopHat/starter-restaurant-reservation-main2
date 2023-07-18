@@ -171,24 +171,12 @@ async function reservationStatusCheck(req,res,next){
       message: `reservation has a status of seated or finished.`
     })
   }
-  // if(data.status !== 'booked'){
-  //   next({
-  //     status: 400,
-  //     message: `status of ${data.status} is an invalid status`
-  //   })
-  // }
+
   next()
 }
 
 async function hasValidStatus(req,res,next){
   const { data } = req.body
-//check if data body status === book,seated, or finished
-// if(data.status === 'finished'){
-//  return next({
-//     status: 400,
-//     message: `reservation status is finished`
-//   })
-// }
 if(data.status === 'booked'|| data.status === 'seated' || data.status === 'finished'|| data.status === "cancelled"){
   res.locals.status = data.status
   return next()
@@ -230,7 +218,13 @@ async function updateReservation(req,res){
 }
 
 module.exports = {
-  create: [hasRequiredProperties, hasOnlyValidProperties, createValidation,reservationStatusCheck, asyncErrorBoundary(create)],
+  create: [
+    hasRequiredProperties, 
+    hasOnlyValidProperties, 
+    createValidation, 
+    reservationStatusCheck, 
+    asyncErrorBoundary(create)
+  ],
   list: [asyncErrorBoundary(list)],
   read: [
     hasResId,
